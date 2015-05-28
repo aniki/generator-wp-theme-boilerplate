@@ -15,6 +15,11 @@ module.exports = yeoman.generators.Base.extend({
 
     var prompts = [{
       type: 'input',
+      name: 'author',
+      message: 'What is your name ?',
+      default: 'myName'
+    },{
+      type: 'input',
       name: 'themeName',
       message: 'What is the name of your theme ?',
       default: 'myTheme'
@@ -108,6 +113,23 @@ module.exports = yeoman.generators.Base.extend({
     this.write('bower.json', JSON.stringify(bower, null, 2));
   },
 
+  app: function () {
+     this.directory('assets');
+     this.mkdir('assets/scripts');
+     this.mkdir('assets/images');
+     this.mkdir('assets/fonts');
+
+     this.copy('scripts/main.js', 'assets/scripts/main.js');
+  },
+
+  themeMetadata: function() {
+    this.fs.copyTpl(
+        this.templatePath('style.css'),
+        this.destinationPath('style.css'),
+        this
+    );
+  },
+
   stylesheets: function () {
     var extension, folder;
 
@@ -126,9 +148,11 @@ module.exports = yeoman.generators.Base.extend({
         folder = ""
     }
 
-    this.directory('styles/' + extension, 'app/styles/' + folder);
-    //this.copy('scripts/', 'app/');
-    //this.template('styles/' + extension + '/main.' + extension, 'app/styles/' + folder + 'main.' + extension);
+    this.directory('styles/' + extension, 'assets/styles/' + folder);
+  },
+
+  phpTemplates: function() {
+    this.directory('php/', '.');
   },
 
   writeIndex: function () {
@@ -144,18 +168,6 @@ module.exports = yeoman.generators.Base.extend({
       sourceFileList: ['scripts/main.js'],
       searchPath: ['app', '.tmp']
     });
-  },
-
-  app: function () {
-    /*
-    this.directory('app');
-    this.mkdir('app/scripts');
-    this.mkdir('app/styles');
-    this.mkdir('app/images');
-    this.write('app/index.html', this.indexFile);
-
-    this.copy('scripts/main.js', 'app/scripts/main.js');
-    */
   },
 
   writing: {
