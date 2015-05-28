@@ -1,0 +1,36 @@
+{
+  "name": "generator-wp-theme-boilerplate",
+  "version": "0.0.0",
+  "description": "Yeoman generator",
+  "license": "MIT",
+  "main": "app/index.js",
+  "repository": "aniki/generator-wp-theme-boilerplate",
+  "author": {
+    "name": "Raphaël Nanni",
+    "email": "",
+    "url": "https://github.com/aniki"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "files": [
+    "generators"
+  ],
+  "keywords": [
+    "yeoman-generator"
+  ],
+  "dependencies": {
+    "yeoman-generator": "^0.19.0",
+    "chalk": "^1.0.0",
+    "cheerio": "^0.18.0",
+    "yosay": "^1.0.2"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "grunt-cli": "^0.1.13",
+    "underscore": "^1.6.0"
+  },
+  "peerDependencies": {
+    "generator-mocha": ">=0.1.0"
+  }
+}
