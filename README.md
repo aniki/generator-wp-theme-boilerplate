@@ -46,7 +46,8 @@ Optional Client-side libs proposed via bower:
 
 ### Features list
 
-* CSS preprocessor
+* CSS preprocessor (LESS/SASS)
+* CSS normalize
 * Concatenation/minification
 * fingerprinting
 * Image optimization
@@ -63,6 +64,4 @@ MIT
     * LESS/SASS watcher option
     * SSI option
     * Webfont option
-* Bower
-    * populate bower.json with user selected options
 * Travis integration

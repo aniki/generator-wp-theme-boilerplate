@@ -5,6 +5,21 @@ var chalk = require('chalk');
 var yosay = require('yosay');
 
 module.exports = yeoman.generators.Base.extend({
+
+  constructor: function () {
+    yeoman.generators.Base.apply(this, arguments);
+
+    // setup the test-framework property, Gruntfile template will need this
+    this.option('test-framework', {
+      desc: 'Test framework to be invoked',
+      type: String,
+      defaults: 'mocha'
+    });
+    this.testFramework = this.options['test-framework'];
+
+    this.pkg = require('../../package.json');
+  },
+
   prompting: function () {
     var done = this.async();
 
@@ -30,26 +45,30 @@ module.exports = yeoman.generators.Base.extend({
       default: 'http://localhost/'
     },{
       type: 'list',
+      name: 'taskRunner',
+      message: 'Would you like to use Grunt or Gulp?',
+      default: 'grunt',
+      choices: ['grunt', 'gulp']
+    },{
+      type: 'list',
       name: 'cssPreProcessor',
       message: 'Would you like to use SASS or LESS?',
       default: 'less',
-      choices: ['less', 'sass', 'nope']
-    },
-    {
-      type: 'checkbox',
-      name: 'buildTools',
-      message: 'Would you add some of these building tools ?',
-      choices: [{
-        name: 'Server Side Includes (SSI)',
-        value: 'includeSSI',
-        checked: true
-      },{
-        name: 'Webfont generator',
-        value: 'includeWebfont',
-        checked: true
-      }]
-    },
-    {
+      choices: ['less', 'sass', 'none']
+    },{
+    //  type: 'checkbox',
+    //  name: 'buildTools',
+    //  message: 'Would you add some of these building tools ?',
+    //  choices: [{
+    //    name: 'Server Side Includes (SSI)',
+    //    value: 'includeSSI',
+    //    checked: true
+    //  },{
+    //    name: 'Webfont generator',
+    //    value: 'includeWebfont',
+    //    checked: true
+    //  }]
+    //},{
       type: 'checkbox',
       name: 'bowerLibs',
       message: 'Would you like to add some libs to Bower ?',
@@ -80,9 +99,13 @@ module.exports = yeoman.generators.Base.extend({
         return promptItem && promptItem.indexOf(feature) !== -1;
       }
 
+      // optional build tasks
+      /*
       this.includeSSI = hasFeature(props.buildTools, 'includeSSI');
       this.includeWebfont = hasFeature(props.buildTools, 'includeSSI');
+      */
 
+      // bower libs
       this.includeModernizr = hasFeature(props.bowerLibs, 'includeModernizr');
       this.includeLodash = hasFeature(props.bowerLibs, 'includeLodash');
       this.includeFlexslider = hasFeature(props.bowerLibs, 'includeFlexslider');
@@ -97,29 +120,70 @@ module.exports = yeoman.generators.Base.extend({
       name: this.props.themeName,
       //name: this._.slugify(this.props.themeName),
       private: true,
-      dependencies: {}
+      dependencies: {},
+      overrides: {}
     };
 
-    bower.dependencies.jquery = '~1.11.1';
+    bower.dependencies.jquery = '~1.11.3';
 
     if (this.includeModernizr) {
-      bower.dependencies.modernizr = '~2.8.2';
+      bower.dependencies.modernizr = '~2.8.3';
     }
     if (this.includeLodash) {
       bower.dependencies.lodash = '~3.9.3';
+    }
+    if (this.includeFlexslider) {
+      bower.dependencies.FlexSlider = 'https://github.com/woothemes/FlexSlider.git';
+      bower.overrides.FlexSlider = {
+        "main": [
+          "jquery.flexslider.js",
+          "flexslider.css"
+        ]
+      };
+    }
+    if (this.includeIsotope) {
+      bower.dependencies.isotope = '~2.2.0';
+    }
+    if (this.includeColorbox) {
+      bower.dependencies.colorbox = "~1.5.10";
     }
 
     this.copy('bowerrc', '.bowerrc');
     this.write('bower.json', JSON.stringify(bower, null, 2));
   },
 
-  app: function () {
-     this.directory('assets');
-     this.mkdir('assets/scripts');
-     this.mkdir('assets/images');
-     this.mkdir('assets/fonts');
+  npm: function() {
+    this.template('_package.json', 'package.json');
+  },
 
-     this.copy('scripts/main.js', 'assets/scripts/main.js');
+  editorConfig: function () {
+    this.copy('editorconfig', '.editorconfig');
+  },
+
+  grunt: function() {
+    if (this.props.taskRunner == 'grunt') {
+      this.template('Gruntfile.js');
+    }
+  },
+
+  gulp: function() {
+    if (this.props.taskRunner == 'gulp') {
+      this.template('gulpfile.js');
+    }
+  },
+
+  mamp: function() {
+    this.copy('osx-mamp-watch.command', 'osx-mamp-watch.command');
+  },
+
+  app: function () {
+     this.mkdir('assets');
+     this.directory('src');
+     this.mkdir('src/scripts');
+     this.mkdir('src/images');
+     this.mkdir('src/fonts');
+
+     this.copy('scripts/main.js', 'src/scripts/main.js');
   },
 
   themeMetadata: function() {
@@ -148,7 +212,7 @@ module.exports = yeoman.generators.Base.extend({
         folder = ""
     }
 
-    this.directory('styles/' + extension, 'assets/styles/' + folder);
+    this.directory('styles/' + extension, 'src/styles/' + folder);
   },
 
   phpTemplates: function() {
@@ -172,6 +236,7 @@ module.exports = yeoman.generators.Base.extend({
 
   writing: {
     app: function () {
+      /*
       this.fs.copy(
         this.templatePath('_package.json'),
         this.destinationPath('package.json')
@@ -180,6 +245,7 @@ module.exports = yeoman.generators.Base.extend({
         this.templatePath('_bower.json'),
         this.destinationPath('bower.json')
       );
+      */
     },
 
     projectfiles: function () {
@@ -195,6 +261,6 @@ module.exports = yeoman.generators.Base.extend({
   },
 
   install: function () {
-    this.installDependencies();
+    //this.installDependencies();
   }
 });

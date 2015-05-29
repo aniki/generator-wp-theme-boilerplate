@@ -20,8 +20,8 @@ module.exports = function (grunt) {
 
   // Configurable paths
   var config = {
-    app: 'app',
-    dist: 'dist'
+    app: 'src',
+    dist: 'assets'
   };
 
   // Define the configuration for all the tasks
@@ -35,29 +35,30 @@ module.exports = function (grunt) {
       bower: {
         files: ['bower.json'],
         tasks: ['wiredep']
-      },<% if (coffee) { %>
-      coffee: {
-        files: ['<%%= config.app %>/scripts/{,*/}*.{coffee,litcoffee,coffee.md}'],
-        tasks: ['coffee:dist']
       },
-      coffeeTest: {
-        files: ['test/spec/{,*/}*.{coffee,litcoffee,coffee.md}'],
-        tasks: ['coffee:test', 'test:watch']
-      },<% } else { %>
       js: {
         files: ['<%%= config.app %>/scripts/{,*/}*.js'],
-        tasks: ['jshint'],
+        tasks: ['jshint']
       },
       jstest: {
         files: ['test/spec/{,*/}*.js'],
         tasks: ['test:watch']
-      },<% } %>
+      },
       gruntfile: {
         files: ['Gruntfile.js']
-      },<% if (includeSass) { %>
+      },<% if (props.cssPreProcessor == 'sass') { %>
       sass: {
         files: ['<%%= config.app %>/styles/{,*/}*.{scss,sass}'],
         tasks: ['sass:server', 'autoprefixer']
+      },<% } %>
+      <% if (props.cssPreProcessor == 'less') { %>
+      less: {
+        files: ['<%= config.app %>/less/**/*.less'],
+            tasks: ['less','newer:copy:styles', 'autoprefixer'],
+            options: {
+          nospawn: true,
+              livereload: true
+        }
       },<% } %>
       styles: {
         files: ['<%%= config.app %>/styles/{,*/}*.css'],
@@ -155,29 +156,8 @@ module.exports = function (grunt) {
           specs: 'test/spec/{,*/}*.js'
         }
       }
-    },<% } %><% if (coffee) { %>
-
-    // Compiles CoffeeScript to JavaScript
-    coffee: {
-      dist: {
-        files: [{
-          expand: true,
-          cwd: '<%%= config.app %>/scripts',
-          src: '{,*/}*.{coffee,litcoffee,coffee.md}',
-          dest: '.tmp/scripts',
-          ext: '.js'
-        }]
-      },
-      test: {
-        files: [{
-          expand: true,
-          cwd: 'test/spec',
-          src: '{,*/}*.{coffee,litcoffee,coffee.md}',
-          dest: '.tmp/spec',
-          ext: '.js'
-        }]
-      }
-    },<% } %><% if (includeSass) { %>
+    },<% } %>
+    <% if (props.cssPreProcessor == 'sass') { %>
 
     // Compiles Sass to CSS and generates necessary files if requested
     sass: {
@@ -205,11 +185,26 @@ module.exports = function (grunt) {
         }]
       }
     },<% } %>
+    <% if (props.cssPreProcessor == 'less') { %>
+
+    // Compiles Less to CSS and generates necessary files if requested
+    less: {
+      development: {
+        options: {
+          compress: true,
+              yuicompress: true,
+              optimization: 2
+        },
+        files: {
+          "<%= config.app %>/css/main.css": "<%= config.app %>/less/main.less" // destination file and source file
+        }
+      }
+    },<% } %>
 
     // Add vendor prefixed styles
     autoprefixer: {
       options: {
-        browsers: ['> 1%', 'last 2 versions', 'Firefox ESR', 'Opera 12.1']<% if (includeSass) { %>,
+        browsers: ['> 1%', 'last 2 versions', 'Firefox ESR', 'Opera 12.1']<% if (props.cssPreProcessor == 'sass') { %>,
         map: {
           prev: '.tmp/styles/'
         }
@@ -229,14 +224,17 @@ module.exports = function (grunt) {
     wiredep: {
       app: {
         ignorePath: /^<%= config.app %>\/|\.\.\//,
-        src: ['<%%= config.app %>/index.html']<% if (includeBootstrap) { %>,<% if (includeSass) { %>
-        exclude: ['bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.js']<% } else { %>
-        exclude: ['bower_components/bootstrap/dist/js/bootstrap.js']<% } } %>
-      }<% if (includeSass) { %>,
+        src: ['<%%= config.app %>/index.html']
+      }<% if (props.cssPreProcessor == 'sass') { %>,
       sass: {
         src: ['<%%= config.app %>/styles/{,*/}*.{scss,sass}'],
         ignorePath: /(\.\.\/){1,2}bower_components\//
       }<% } %>
+      <% if (props.cssPreProcessor == 'less') { %>,
+        sass: {
+          src: ['<%%= config.app %>/styles/{,*/}*.{scss,sass}'],
+              ignorePath: /(\.\.\/){1,2}bower_components\//
+        }<% } %>
     },
 
     // Renames files for browser caching purposes
@@ -324,28 +322,28 @@ module.exports = function (grunt) {
     // By default, your `index.html`'s <!-- Usemin block --> will take care
     // of minification. These next options are pre-configured if you do not
     // wish to use the Usemin blocks.
-    // cssmin: {
-    //   dist: {
-    //     files: {
-    //       '<%%= config.dist %>/styles/main.css': [
-    //         '.tmp/styles/{,*/}*.css',
-    //         '<%%= config.app %>/styles/{,*/}*.css'
-    //       ]
-    //     }
-    //   }
-    // },
-    // uglify: {
-    //   dist: {
-    //     files: {
-    //       '<%%= config.dist %>/scripts/scripts.js': [
-    //         '<%%= config.dist %>/scripts/scripts.js'
-    //       ]
-    //     }
-    //   }
-    // },
-    // concat: {
-    //   dist: {}
-    // },
+    cssmin: {
+       dist: {
+         files: {
+           '<%%= config.dist %>/styles/main.css': [
+             '.tmp/styles/{,*/}*.css',
+             '<%%= config.app %>/styles/{,*/}*.css'
+           ]
+         }
+       }
+    },
+    uglify: {
+       dist: {
+         files: {
+           '<%%= config.dist %>/scripts/scripts.js': [
+             '<%%= config.dist %>/scripts/scripts.js'
+           ]
+         }
+       }
+    },
+    concat: {
+       dist: {}
+    },
 
     // Copies remaining files to places other tasks can use
     copy: {
@@ -361,31 +359,17 @@ module.exports = function (grunt) {
             '{,*/}*.html',
             'styles/fonts/{,*/}*.*'
           ]
-        }<% if (includeBootstrap) { %>, {
-          expand: true,
-          dot: true,
-          cwd: '<% if (includeSass) {
-              %>.<%
-            } else {
-              %>bower_components/bootstrap/dist<%
-            } %>',
-          src: '<% if (includeSass) {
-              %>bower_components/bootstrap-sass-official/assets/fonts/bootstrap/*<%
-            } else {
-              %>fonts/*<%
-            } %>',
-          dest: '<%%= config.dist %>'
-        }<% } %>]
-      }<% if (!includeSass) { %>,
-      styles: {
-        expand: true,
-        dot: true,
-        cwd: '<%%= config.app %>/styles',
-        dest: '.tmp/styles/',
-        src: '{,*/}*.css'
+        }]
+       }<% if (props.cssPreProcessor == 'none') { %>,
+       styles: {
+           expand: true,
+           dot: true,
+           cwd: '<%%= config.app %>/styles',
+           dest: '.tmp/styles/',
+           src: '{,*/}*.css'
       }<% } %>
-    },<% if (includeModernizr) { %>
-
+    },
+    <% if (includeModernizr) { %>
     // Generates a custom Modernizr build that includes only the tests you
     // reference in your app
     modernizr: {
@@ -405,19 +389,18 @@ module.exports = function (grunt) {
 
     // Run some tasks in parallel to speed up build process
     concurrent: {
-      server: [<% if (coffee) {  %>
-        'coffee:dist',<% } %><% if (includeSass) { %>
-        'sass:server'<% } else { %>
+      server: [<% if (props.cssPreProcessor == 'none') { %>
+        'copy:styles'<% } if (props.cssPreProcessor == 'sass') { %>
+        'sass:server'<% } if (props.cssPreProcessor == 'less') {%>
+        'less'<% } %>
+      ],
+      test: [<% if (props.cssPreProcessor == 'none') { %>
         'copy:styles'<% } %>
       ],
-      test: [<% if (coffee) { %>
-        'coffee'<% } %><% if (coffee && !includeSass) {  %>,<% } %><% if (!includeSass) { %>
-        'copy:styles'<% } %>
-      ],
-      dist: [<% if (coffee) { %>
-        'coffee',<% } %><% if (includeSass) { %>
-        'sass',<% } else { %>
-        'copy:styles',<% } %>
+      dist: [<% if (props.cssPreProcessor == 'none') { %>
+        'copy:styles',<% } if (props.cssPreProcessor == 'sass') { %>
+        'sass',<% } if (props.cssPreProcessor == 'less') { %>
+        'less',<% } %>
         'imagemin',
         'svgmin'
       ]
@@ -464,7 +447,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', [
     'clean:dist',
-    'wiredep',
+    //'wiredep',
     'useminPrepare',
     'concurrent:dist',
     'autoprefixer',
@@ -479,8 +462,8 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('default', [
-    'newer:jshint',
-    'test',
+    //'newer:jshint',
+    //'test',
     'build'
   ]);
 };

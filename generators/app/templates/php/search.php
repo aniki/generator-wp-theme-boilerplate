@@ -1,14 +1,19 @@
-<?php get_template_part('templates/page', 'header'); ?>
+<?php get_header(); ?>
 
-<?php if (!have_posts()) : ?>
-  <div class="alert alert-warning">
-    <?php _e('Sorry, no results were found.', 'sage'); ?>
-  </div>
-  <?php get_search_form(); ?>
-<?php endif; ?>
+	<main role="main">
+		<!-- section -->
+		<section>
 
-<?php while (have_posts()) : the_post(); ?>
-  <?php get_template_part('templates/content', 'search'); ?>
-<?php endwhile; ?>
+			<h1><?php echo sprintf( __( '%s Search Results for ', 'html5blank' ), $wp_query->found_posts ); echo get_search_query(); ?></h1>
 
-<?php the_posts_navigation(); ?>
+			<?php get_template_part('loop'); ?>
+
+			<?php get_template_part('pagination'); ?>
+
+		</section>
+		<!-- /section -->
+	</main>
+
+<?php get_sidebar(); ?>
+
+<?php get_footer(); ?>
