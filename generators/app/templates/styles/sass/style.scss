@@ -1,7 +1,16 @@
+/*!
+Theme Name:         <%= props.themeName %>
+Theme URI:          <%= props.host %>
+Description:
+Version:            1.0
+Author:             <%= props.author %>
+Author URI:
+*/
+
 @import "common/_variables";
 
 // Automatically injected Bower dependencies via wiredep (never manually edit this block)
-// bower:less
+// bower:sass
 // endbower
 
 @import "common/_global";

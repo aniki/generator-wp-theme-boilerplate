@@ -187,11 +187,30 @@ module.exports = yeoman.generators.Base.extend({
   },
 
   themeMetadata: function() {
-    this.fs.copyTpl(
-        this.templatePath('style.css'),
-        this.destinationPath('style.css'),
-        this
-    );
+    // vanilla css
+    if (this.props.cssPreProcessor == 'none') {
+      this.fs.copyTpl(
+          this.templatePath('styles/css/style.css'),
+          this.destinationPath('style.css'),
+          this
+      );
+    }
+    // sass
+    if (this.props.cssPreProcessor == 'sass') {
+      this.fs.copyTpl(
+          this.templatePath('styles/sass/style.scss'),
+          this.destinationPath('src/styles/sass/style.scss'),
+          this
+      );
+    }
+    // less
+    if (this.props.cssPreProcessor == 'less') {
+      this.fs.copyTpl(
+          this.templatePath('styles/less/style.less'),
+          this.destinationPath('src/styles/less/style.less'),
+          this
+      );
+    }
   },
 
   stylesheets: function () {
@@ -199,20 +218,16 @@ module.exports = yeoman.generators.Base.extend({
 
     switch (this.props.cssPreProcessor) {
       case "less" :
-        extension = "less";
-        folder = "less/"
+        this.directory('styles/less/', 'src/styles/less/');
         break;
       case "sass" :
-        extension = "scss"
-        folder = "sass/"
+        this.directory('styles/sass/', 'src/styles/sass/');
         break;
       case "nope" :
       default :
-        extension = "css";
-        folder = ""
+        this.copy('styles/css/style.css', 'style.css');
     }
 
-    this.directory('styles/' + extension, 'src/styles/' + folder);
   },
 
   phpTemplates: function() {

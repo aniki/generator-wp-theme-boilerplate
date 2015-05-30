@@ -48,12 +48,12 @@ module.exports = function (grunt) {
         files: ['Gruntfile.js']
       },<% if (props.cssPreProcessor == 'sass') { %>
       sass: {
-        files: ['<%%= config.app %>/styles/{,*/}*.{scss,sass}'],
+        files: ['<%%= config.app %>/styles/sass/{,*/}*.{scss,sass}'],
         tasks: ['sass:server', 'autoprefixer']
       },<% } %>
       <% if (props.cssPreProcessor == 'less') { %>
       less: {
-        files: ['<%= config.app %>/less/**/*.less'],
+        files: ['<%= config.app %>/styles/less/**/*.less'],
             tasks: ['less','newer:copy:styles', 'autoprefixer'],
             options: {
           nospawn: true,
@@ -169,7 +169,7 @@ module.exports = function (grunt) {
       dist: {
         files: [{
           expand: true,
-          cwd: '<%%= config.app %>/styles',
+          cwd: '<%%= config.app %>/styles/sass',
           src: ['*.{scss,sass}'],
           dest: '.tmp/styles',
           ext: '.css'
@@ -178,7 +178,7 @@ module.exports = function (grunt) {
       server: {
         files: [{
           expand: true,
-          cwd: '<%%= config.app %>/styles',
+          cwd: '<%%= config.app %>/styles/sass',
           src: ['*.{scss,sass}'],
           dest: '.tmp/styles',
           ext: '.css'
@@ -196,7 +196,7 @@ module.exports = function (grunt) {
               optimization: 2
         },
         files: {
-          "<%= config.app %>/css/main.css": "<%= config.app %>/less/main.less" // destination file and source file
+          ".tmp/styles/style.css": "<%%= config.app %>/styles/less/style.less" // destination file and source file
         }
       }
     },<% } %>
@@ -204,7 +204,7 @@ module.exports = function (grunt) {
     // Add vendor prefixed styles
     autoprefixer: {
       options: {
-        browsers: ['> 1%', 'last 2 versions', 'Firefox ESR', 'Opera 12.1']<% if (props.cssPreProcessor == 'sass') { %>,
+        browsers: ['> 1%', 'last 2 versions', 'Firefox ESR', 'Opera 12.1']<% if (props.cssPreProcessor != 'none') { %>,
         map: {
           prev: '.tmp/styles/'
         }
@@ -231,8 +231,8 @@ module.exports = function (grunt) {
         ignorePath: /(\.\.\/){1,2}bower_components\//
       }<% } %>
       <% if (props.cssPreProcessor == 'less') { %>,
-        sass: {
-          src: ['<%%= config.app %>/styles/{,*/}*.{scss,sass}'],
+        less: {
+          src: ['<%%= config.app %>/styles/{,*/}*.{less}'],
               ignorePath: /(\.\.\/){1,2}bower_components\//
         }<% } %>
     },
@@ -325,7 +325,7 @@ module.exports = function (grunt) {
     cssmin: {
        dist: {
          files: {
-           '<%%= config.dist %>/styles/main.css': [
+           'style.css': [
              '.tmp/styles/{,*/}*.css',
              '<%%= config.app %>/styles/{,*/}*.css'
            ]
@@ -416,7 +416,7 @@ module.exports = function (grunt) {
 
     grunt.task.run([
       'clean:server',
-      'wiredep',
+      //'wiredep',
       'concurrent:server',
       'autoprefixer',
       'browserSync:livereload',
@@ -456,7 +456,7 @@ module.exports = function (grunt) {
     'uglify',
     'copy:dist',<% if (includeModernizr) { %>
     'modernizr',<% } %>
-    'filerev',
+    //'filerev',
     'usemin',
     'htmlmin'
   ]);
