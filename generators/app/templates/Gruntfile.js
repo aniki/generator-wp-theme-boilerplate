@@ -333,13 +333,11 @@ module.exports = function (grunt) {
        }
     },
     uglify: {
-       dist: {
-         files: {
-           '<%%= config.dist %>/scripts/scripts.js': [
-             '<%%= config.dist %>/scripts/scripts.js'
-           ]
-         }
-       }
+      dist: {
+        files: {
+          "<%%= config.dist %>/scripts/scripts.js" : grunt.file.readJSON('src/scripts/dependencies.json')
+        }
+      }
     },
     concat: {
        dist: {}
@@ -458,7 +456,7 @@ module.exports = function (grunt) {
     'modernizr',<% } %>
     //'filerev',
     'usemin',
-    'htmlmin'
+    //'htmlmin'
   ]);
 
   grunt.registerTask('default', [

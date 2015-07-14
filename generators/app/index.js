@@ -133,13 +133,15 @@ module.exports = yeoman.generators.Base.extend({
       bower.dependencies.lodash = '~3.9.3';
     }
     if (this.includeFlexslider) {
-      bower.dependencies.FlexSlider = 'https://github.com/woothemes/FlexSlider.git';
+      bower.dependencies.FlexSlider = '~2.5.0';
+      /*
       bower.overrides.FlexSlider = {
         "main": [
           "jquery.flexslider.js",
           "flexslider.css"
         ]
       };
+      */
     }
     if (this.includeIsotope) {
       bower.dependencies.isotope = '~2.2.0';
@@ -156,10 +158,6 @@ module.exports = yeoman.generators.Base.extend({
     this.template('_package.json', 'package.json');
   },
 
-  editorConfig: function () {
-    this.copy('editorconfig', '.editorconfig');
-  },
-
   grunt: function() {
     if (this.props.taskRunner == 'grunt') {
       this.template('Gruntfile.js');
@@ -172,10 +170,6 @@ module.exports = yeoman.generators.Base.extend({
     }
   },
 
-  mamp: function() {
-    this.copy('osx-mamp-watch.command', 'osx-mamp-watch.command');
-  },
-
   app: function () {
      this.mkdir('assets');
      this.directory('src');
@@ -183,7 +177,9 @@ module.exports = yeoman.generators.Base.extend({
      this.mkdir('src/images');
      this.mkdir('src/fonts');
 
-     this.copy('scripts/main.js', 'src/scripts/main.js');
+    this.directory('scripts/', 'src/scripts/');
+    this.directory('images/', 'src/images/');
+    this.directory('fonts/', 'src/fonts/');
   },
 
   themeMetadata: function() {
@@ -230,6 +226,12 @@ module.exports = yeoman.generators.Base.extend({
 
   },
 
+  /*
+  scripts: function() {
+    this.directory('scripts/', 'src/scripts/');
+  },
+  */
+
   phpTemplates: function() {
     this.directory('php/', '.');
   },
@@ -261,6 +263,14 @@ module.exports = yeoman.generators.Base.extend({
         this.destinationPath('bower.json')
       );
       */
+    },
+
+    mamp: function() {
+      this.copy('osx-mamp-watch.command', 'osx-mamp-watch.command');
+    },
+
+    editorConfig: function () {
+      this.copy('editorconfig', '.editorconfig');
     },
 
     projectfiles: function () {

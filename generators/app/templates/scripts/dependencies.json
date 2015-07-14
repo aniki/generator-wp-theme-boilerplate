@@ -1,0 +1,6 @@
+[
+  "src/scripts/utils/array.remove.js",
+  "src/scripts/utils/class.js",
+  "src/scripts/utils/smartresize.js",
+  "src/scripts/main.js"
+]

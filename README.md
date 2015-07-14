@@ -61,7 +61,8 @@ MIT
 ## Todo
 
 * Gruntfile
-    * LESS/SASS watcher option
-    * SSI option
+    * Bower dependencies automatic injection
+    * Watch mode
+    * Editor styles
     * Webfont option
 * Travis integration
